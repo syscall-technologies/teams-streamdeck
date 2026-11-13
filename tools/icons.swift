@@ -28,6 +28,8 @@ let keys: [String: (String, NSColor, NSColor)] = [
   "cam-on": ("video.fill", green, .white), "cam-off": ("video.slash.fill", red, .white), "cam-na": ("video.slash.fill", dark, dim),
   "share-idle": ("rectangle.on.rectangle", purple, .white), "share-on": ("rectangle.on.rectangle", red, .white),
   "share-na": ("rectangle.on.rectangle", dark, dim),
+  "hand-lowered": ("hand.raised", purple, .white), "hand-raised": ("hand.raised.fill", amber, .white),
+  "hand-na": ("hand.raised", dark, dim),
   "leave": ("phone.down.fill", red, .white), "leave-na": ("phone.down.fill", dark, dim),
 ]
 for (suffix, scale) in [("", 1.0), ("@2x", 2.0)] {

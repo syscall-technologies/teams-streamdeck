@@ -8,10 +8,15 @@ const CDP = "http://127.0.0.1:9222";
 const BUTTONS = { mute: "microphone-button", camera: "video-button", share: "share-button", leave: "hangup-button" };
 // Reads the aria-labels of the call buttons; null when this page has no call toolbar.
 const STATE_JS = `(() => { const q = i => document.getElementById(i)?.getAttribute('aria-label') ?? null;
-  const s = ${JSON.stringify(BUTTONS)}; const r = {}; for (const k in s) r[k] = q(s[k]); return r.mute ? r : null; })()`;
+  const s = ${JSON.stringify(BUTTONS)}; const r = {}; for (const k in s) r[k] = q(s[k]);
+  r.hand = document.getElementById('reaction-menu-button')?.getAttribute('data-tid') ?? null;
+  return r.mute ? r : null; })()`;
+// Raise hand lives inside the React menu, so we send Teams' own Cmd+Shift+K (Meta=4 | Shift=8) instead of clicking.
+const HAND_KEY = { modifiers: 12, key: "K", code: "KeyK", windowsVirtualKeyCode: 75, nativeVirtualKeyCode: 40 };
 
 // Key state index per manifest: mute/camera 0=off 1=live 2=n/a, share 0=idle 1=sharing 2=n/a,
-// leave 0=ok 2=n/a, launch 0=port down 1=port up. Labels describe the action, not the state.
+// hand 0=lowered 1=raised 2=n/a, leave 0=ok 2=n/a, launch 0=port down 1=port up.
+// Labels describe the action, not the state.
 function stateFor(action, portUp, call) {
   if (action === "launch") return portUp ? 1 : 0;
   if (!call || !call[action]) return 2;
@@ -19,6 +24,7 @@ function stateFor(action, portUp, call) {
   if (action === "mute") return /^mute/i.test(label) ? 1 : 0; // "Mute mic" => currently live
   if (action === "camera") return /off/i.test(label) ? 1 : 0; // "Turn camera off" => currently on
   if (action === "share") return /stop/i.test(label) ? 1 : 0; // shortcut: assumes "Stop sharing"-style label while presenting
+  if (action === "hand") return /hand-lowered/.test(label) ? 0 : 1; // shortcut: only "hand-lowered" seen live, anything else = raised
   return 0;
 }
 
@@ -31,6 +37,9 @@ if (process.argv.includes("--selftest")) {
   assert.equal(stateFor("camera", true, { ...call, camera: "Turn camera on" }), 0);
   assert.equal(stateFor("share", true, call), 0);
   assert.equal(stateFor("leave", true, call), 0);
+  assert.equal(stateFor("hand", true, { ...call, hand: "reaction-menu-button-hand-lowered" }), 0);
+  assert.equal(stateFor("hand", true, { ...call, hand: "reaction-menu-button-hand-raised" }), 1);
+  assert.equal(stateFor("hand", true, call), 2); // no React button (e.g. 1:1 call without reactions)
   assert.equal(stateFor("mute", true, null), 2);
   assert.equal(stateFor("launch", false, null), 0);
   assert.equal(stateFor("launch", true, null), 1);
@@ -38,7 +47,7 @@ if (process.argv.includes("--selftest")) {
   process.exit(0);
 }
 
-// One cached DevTools connection per page target; resolves to an eval(expression) function.
+// One cached DevTools connection per page target; resolves to a cmd(method, params) function.
 const conns = new Map();
 function connect(target) {
   if (conns.has(target.id)) return conns.get(target.id);
@@ -46,15 +55,15 @@ function connect(target) {
     const ws = new WebSocket(target.webSocketDebuggerUrl);
     const pending = new Map();
     let n = 0;
-    ws.onopen = () => resolve((expression) => new Promise((done) => {
+    ws.onopen = () => resolve((method, params) => new Promise((done) => {
       const id = ++n;
       pending.set(id, done);
-      ws.send(JSON.stringify({ id, method: "Runtime.evaluate", params: { expression, returnByValue: true } }));
+      ws.send(JSON.stringify({ id, method, params }));
       setTimeout(() => pending.delete(id) && done(undefined), 2000);
     }));
     ws.onmessage = ({ data }) => {
       const m = JSON.parse(data);
-      pending.get(m.id)?.(m.result?.result?.value);
+      pending.get(m.id)?.(m.result);
       pending.delete(m.id);
     };
     ws.onclose = () => {
@@ -69,7 +78,7 @@ function connect(target) {
 }
 
 let portUp = false;
-let call = null; // { evaluate, state } of the page that has the call toolbar
+let call = null; // { cmd, evaluate, state } of the page that has the call toolbar
 
 async function poll() {
   let targets;
@@ -82,9 +91,10 @@ async function poll() {
   call = null;
   for (const t of targets.filter((t) => t.type === "page")) {
     try {
-      const evaluate = await connect(t);
+      const cmd = await connect(t);
+      const evaluate = async (expression) => (await cmd("Runtime.evaluate", { expression, returnByValue: true }))?.result?.value;
       const state = await evaluate(STATE_JS);
-      if (state) { call = { evaluate, state }; return; }
+      if (state) { call = { cmd, evaluate, state }; return; }
     } catch { /* page went away mid-poll */ }
   }
 }
@@ -127,7 +137,11 @@ ws.onmessage = async ({ data }) => {
   if (event === "willDisappear") keys.delete(context);
   if (event !== "keyDown") return;
   if (name === "launch") return launchTeams();
-  if (!call) return send({ event: "showAlert", context });
+  if (!call || (name === "hand" && !call.state.hand)) return send({ event: "showAlert", context });
+  if (name === "hand") {
+    for (const type of ["rawKeyDown", "keyUp"]) await call.cmd("Input.dispatchKeyEvent", { type, ...HAND_KEY });
+    return setTimeout(refresh, 150);
+  }
   await call.evaluate(`document.getElementById(${JSON.stringify(BUTTONS[name])})?.click()`);
   setTimeout(refresh, 150);
 };

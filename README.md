@@ -4,7 +4,7 @@
 
 # Teams Control for Stream Deck
 
-**Mute, camera, share and leave for the new Microsoft Teams on macOS, with keys that show the real call state.**
+**Mute, camera, share, raise hand and leave for the new Microsoft Teams on macOS, with keys that show the real call state.**
 
 [![macOS 12+](https://img.shields.io/badge/macOS-12%2B-000000?logo=apple&logoColor=white)](#requirements)
 [![Stream Deck 7.1+](https://img.shields.io/badge/Stream%20Deck-7.1%2B-6E44FF)](#requirements)
@@ -21,6 +21,7 @@
     <td align="center"><img src="com.sclt.teams.sdPlugin/imgs/mic-muted@2x.png" width="72" alt="Muted"><br><sub><b>Mute</b></sub></td>
     <td align="center"><img src="com.sclt.teams.sdPlugin/imgs/cam-on@2x.png" width="72" alt="Camera on"><br><sub><b>Camera</b></sub></td>
     <td align="center"><img src="com.sclt.teams.sdPlugin/imgs/share-idle@2x.png" width="72" alt="Share"><br><sub><b>Share</b></sub></td>
+    <td align="center"><img src="com.sclt.teams.sdPlugin/imgs/hand-lowered@2x.png" width="72" alt="Raise hand"><br><sub><b>Raise hand</b></sub></td>
     <td align="center"><img src="com.sclt.teams.sdPlugin/imgs/leave@2x.png" width="72" alt="Leave"><br><sub><b>Leave</b></sub></td>
   </tr>
 </table>
@@ -70,6 +71,7 @@ Restart the Stream Deck app, then drag the actions onto keys.
 | Mute | 🟢 mic live · 🔴 muted |
 | Camera | 🟢 on · 🔴 off |
 | Share | 🟣 opens the Teams share picker · 🔴 sharing (press to stop) |
+| Raise hand | 🟣 hand down · 🟠 hand raised (sends Teams' own ⌘⇧K in the background) |
 | Leave | 🔴 hangs up |
 
 Outside a call the keys are grey, and pressing one shows the ⚠ alert.

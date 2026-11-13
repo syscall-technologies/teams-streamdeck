@@ -4,7 +4,7 @@
   "Name": "Teams Control",
   "Version": "1.0.0.0",
   "Author": "0xSeb",
-  "Description": "Mute, camera, share and leave for new Microsoft Teams on macOS, with live key state.",
+  "Description": "Mute, camera, share, raise hand and leave for new Microsoft Teams on macOS, with live key state.",
   "Icon": "imgs/plugin",
   "Category": "Teams Control",
   "CategoryIcon": "imgs/category",
@@ -101,6 +101,28 @@
         },
         {
           "Image": "imgs/share-na"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.sclt.teams.hand",
+      "Name": "Raise hand",
+      "Tooltip": "Raise or lower your hand (Teams' Cmd+Shift+K)",
+      "Icon": "imgs/action",
+      "Controllers": [
+        "Keypad"
+      ],
+      "DisableAutomaticStates": true,
+      "States": [
+        {
+          "Image": "imgs/hand-lowered"
+        },
+        {
+          "Image": "imgs/hand-raised"
+        },
+        {
+          "Image": "imgs/hand-na"
         }
       ],
       "SupportedInMultiActions": false
