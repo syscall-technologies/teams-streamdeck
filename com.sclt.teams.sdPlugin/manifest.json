@@ -1,0 +1,130 @@
+{
+  "SDKVersion": 2,
+  "UUID": "com.sclt.teams",
+  "Name": "Teams Control",
+  "Version": "1.0.0.0",
+  "Author": "0xSeb",
+  "Description": "Mute, camera, share and leave for new Microsoft Teams on macOS, with live key state.",
+  "Icon": "imgs/plugin",
+  "Category": "Teams Control",
+  "CategoryIcon": "imgs/category",
+  "CodePath": "plugin.js",
+  "Nodejs": {
+    "Version": "24"
+  },
+  "OS": [
+    {
+      "Platform": "mac",
+      "MinimumVersion": "12"
+    }
+  ],
+  "Software": {
+    "MinimumVersion": "7.1"
+  },
+  "Actions": [
+    {
+      "UUID": "com.sclt.teams.launch",
+      "Name": "Start Teams",
+      "Tooltip": "Restart Teams with the DevTools port so the other keys work",
+      "Icon": "imgs/action",
+      "Controllers": [
+        "Keypad"
+      ],
+      "DisableAutomaticStates": true,
+      "States": [
+        {
+          "Image": "imgs/teams-off"
+        },
+        {
+          "Image": "imgs/teams-on"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.sclt.teams.mute",
+      "Name": "Mute",
+      "Icon": "imgs/action",
+      "Controllers": [
+        "Keypad"
+      ],
+      "DisableAutomaticStates": true,
+      "States": [
+        {
+          "Image": "imgs/mic-muted"
+        },
+        {
+          "Image": "imgs/mic-live"
+        },
+        {
+          "Image": "imgs/mic-na"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.sclt.teams.camera",
+      "Name": "Camera",
+      "Icon": "imgs/action",
+      "Controllers": [
+        "Keypad"
+      ],
+      "DisableAutomaticStates": true,
+      "States": [
+        {
+          "Image": "imgs/cam-off"
+        },
+        {
+          "Image": "imgs/cam-on"
+        },
+        {
+          "Image": "imgs/cam-na"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.sclt.teams.share",
+      "Name": "Share",
+      "Tooltip": "Opens the Teams share picker (or stops sharing)",
+      "Icon": "imgs/action",
+      "Controllers": [
+        "Keypad"
+      ],
+      "DisableAutomaticStates": true,
+      "States": [
+        {
+          "Image": "imgs/share-idle"
+        },
+        {
+          "Image": "imgs/share-on"
+        },
+        {
+          "Image": "imgs/share-na"
+        }
+      ],
+      "SupportedInMultiActions": false
+    },
+    {
+      "UUID": "com.sclt.teams.leave",
+      "Name": "Leave",
+      "Icon": "imgs/action",
+      "Controllers": [
+        "Keypad"
+      ],
+      "DisableAutomaticStates": true,
+      "States": [
+        {
+          "Image": "imgs/leave"
+        },
+        {
+          "Image": "imgs/leave"
+        },
+        {
+          "Image": "imgs/leave-na"
+        }
+      ],
+      "SupportedInMultiActions": false
+    }
+  ]
+}
